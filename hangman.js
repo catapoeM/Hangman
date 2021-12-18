@@ -1,18 +1,17 @@
 function play() {
-
-	var words = ['car', 'banana', 'apple', 'dracula', 'motorcycle',
-	 'country', 'bite', 'vampire'];
-
-	var underline = [];
+	var words = ['house', 'orange', 'biscuit', 'empire', 'america',
+	 'demon', 'crocodile', 'human'];
+	var underlines = [];
 	var buttons = [];
 	var lives = 0;
-	var wordCheck = 0;
+	var wordLengthCheck = 0;
 	var info = 0;
+	let choseRandom = 0;
 	createAlphabet();
-    createGuess();
-    
-    
+    createGuess(); 
+    // Create alphabet 
     function createAlphabet() {
+    	document.getElementById("playButton").disabled = true; 
     	lives = 5;
     	var letter;
     	for (var i = 97; i <= 122; ++i) {
@@ -27,78 +26,65 @@ function play() {
   		}
   		info = document.getElementById('info');
 		info.innerHTML = "GUESS THE WORD, YOU HAVE " + lives + " LIVES";
-  		
     }
-  	
+    // Create the guess by choosing a random word from the list of words
   	function createGuess() {
-  		var letterUnder = 0;
+  		var letter = 0;
 		var unknownWord = 0;
-		let choseRandom = Math.floor((Math.random() * 8));
-		wordCheck = words[choseRandom].length;
+		choseRandom = Math.floor((Math.random() * 8));
+		wordLengthCheck = words[choseRandom].length;
 		for (var i = 0, unknownWord = words[choseRandom]; i < 1; ++i) {
 			for (var j = 0; j < unknownWord.length; ++j) {
-				letterUnder = unknownWord[j];
-				underline[j] = document.createElement('button');
-				underline[j].innerHTML = "_";
-				underline[j].setAttribute("data-letter", letterUnder);
-				document.getElementById("unknownWord").appendChild(underline[j]);
-				
+				letter = unknownWord[j];
+				underlines[j] = document.createElement('button');
+				underlines[j].innerHTML = "_";
+				underlines[j].setAttribute("data-letter", letter);
+				document.getElementById("unknownWord").appendChild(underlines[j]);
 			}
 		}
 	}
-
-
+	// We pick a letter from the Alphabet and compare it with the unknown word
+	// Then we show a text depending on 3 facts: 1- if we guess the letter; 2- if we don't
+	// 3- if we lose the game, because of the amount of giving wrong answers
  	function pickLetter(letter) {
- 		var idxLetter = letter.charCodeAt(letter);
- 		buttons[idxLetter].setAttribute("disabled", "");
- 		
+ 		var indexLetter = letter.charCodeAt(letter);
+ 		buttons[indexLetter].setAttribute("disabled", "");
  		var found = 0;
-		for (var i = 0; i < underline.length; ++i) {
-    	var guess = underline[i].getAttribute("data-letter");
-    		if (letter == guess) {
-    			found = 1;
-    			underline[i].setAttribute("data-letter", letter);
-    			underline[i].innerHTML = letter;
-    			--wordCheck;
-    		}
+		for (var i = 0; i < underlines.length; ++i) {
+	    	var guess = underlines[i].getAttribute("data-letter");
+	    	if (letter == guess) {
+	    		found = 1;
+	    		underlines[i].setAttribute("data-letter", letter);
+	    		underlines[i].innerHTML = letter;
+	    		--wordLengthCheck;
+	    	}
     	}
-    	if (found == 0 && lives >= 1 && wordCheck > 0) {
+    	if (found == 0 && lives >= 1 && wordLengthCheck > 0) {
     		--lives;
 			info = document.getElementById('info');
 			info.innerHTML = "You did not guess, try again! " + lives + " lives left!";
-    	}
-    	if (lives == 0) {
-    	 	info = document.getElementById('info');
-			info.innerHTML = "I'm sorry, but you LOSE!";
-			for (i = 97; i <= 122; ++i) {
-				buttons[i].setAttribute("disabled", "");
-			}
-			var reset = document.createElement('button');
-			reset.innerHTML = "RESET";
-			document.getElementById('reset').appendChild(reset);
-	  		reset.onclick = function() {
-	  			for (i = 97; i <= 122; ++i) {
-	  				buttons[i].parentNode.removeChild(buttons[i]);
-	  			}
-	  			for (i = 0; i < underline.length; ++i) {
-	  				underline[i].parentNode.removeChild(underline[i]);
-	  			}
-	  			reset.parentNode.removeChild(reset);
-	  			play();
-	  		}
-    	}
-    	else if (lives >= 1 && wordCheck == 0) {
+			if (lives == 0) {
+				info.innerHTML = "I'm sorry, but you LOSE! The word was: " + words[choseRandom];
+				for (i = 97; i <= 122; ++i) {
+					buttons[i].setAttribute("disabled", "");
+				}
+	    	}
+    	}else if (lives >= 1 && wordLengthCheck == 0) {
     		info = document.getElementById('info');
-			info.innerHTML = "Congratulations! You WIN!";
-			var reset = document.createElement('button');
+			info.innerHTML = "Congratulations! You WON!";
+    	}
+    	// After all we make a button to reset the game.
+    	if (lives == 0 || wordLengthCheck == 0) {
+    		var reset = document.createElement('button');
 			reset.innerHTML = "RESET";
 			document.getElementById('reset').appendChild(reset);
 	  		reset.onclick = function() {
-	  			for (i = 97; i <= 122; ++i) {
-	  				buttons[i].parentNode.removeChild(buttons[i]);
-	  			}
-	  			for (i = 0; i < underline.length; ++i) {
-	  				underline[i].parentNode.removeChild(underline[i]);
+	  			for (i = 0; i <= 122; ++i) {
+	  				if (i >= 0 && i < underlines.length) {
+	  					underlines[i].parentNode.removeChild(underlines[i]);
+	  				}else if (i >= 97 && i <= 122) {
+	  					buttons[i].parentNode.removeChild(buttons[i]);
+	  				} 
 	  			}
 	  			reset.parentNode.removeChild(reset);
 	  			play();
@@ -106,6 +92,3 @@ function play() {
     	}
   	}
 }
-
-
-
